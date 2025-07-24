@@ -1,16 +1,30 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from .forms import CustomUserCreationForm
+from .models import Product, Category
+
+
+
 
 
 def index(request):
+    categories = Category.objects.all()
+    products = Product.objects.all()
     return render(
         request= request,
-        template_name='main/index.html'
+        template_name='main/index.html',
+        context={'products':products,
+                 'categories':categories}
     )
+
+def single_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    return render(request, 'main/single.html', {'product': product})
+
+
 
 def user_register(request):
     if request.method == 'POST':

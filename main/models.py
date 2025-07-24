@@ -35,6 +35,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='products')
     title = models.CharField(max_length=123, verbose_name='Название')
     area = models.CharField(max_length=123, verbose_name='Площадь')
@@ -43,6 +44,7 @@ class Product(models.Model):
     description = models.TextField(verbose_name='Описание')
     promo_video = models.URLField(verbose_name='Промо-видео')
     is_active = models.BooleanField(default=True, verbose_name='Активен')
+    image = models.ImageField(upload_to='media/image_view', null=True, blank=True, verbose_name='Фото')
 
     def __str__(self):
         return self.title
