@@ -84,53 +84,52 @@
 
     <!-- Start Service -->
     <section class="service-wrapper py-3">
-        <div class="container-fluid pb-3">
-            <div class="row">
-                <h2 class="h2 text-center col-12 py-5 semi-bold-600">Категории</h2>
-                <div class="service-header col-2 col-lg-3 text-end light-300">
-                    <i class='bx bx-gift h3 mt-1'></i>
-                </div>
-                <div class="service-heading col-10 col-lg-9 text-start float-end light-300">
-                    <h2 class="h3 pb-4 typo-space-line">Здесь показываются все категории</h2>
-                </div>
-            </div>
-        </div>
+        <!-- Категории -->
+<div class="service-tag py-5 bg-secondary">
+    <div class="col-md-12">
+        <ul class="nav d-flex justify-content-center">
+            <!-- Кнопка "Все" -->
+            <li class="nav-item mx-lg-4">
+                <a class="border-white border-1 filter-btn nav-link btn-outline-primary shadow rounded-pill px-4 white-300 {% if not selected_category %}active{% endif %}"
+                   href="{% url 'index' %}">
+                    Все
+                </a>
+            </li>
 
-        <div class="service-tag py-5 bg-secondary">
-            <div class="col-md-12">
-                <ul class="nav d-flex justify-content-center">
-                    <li class="nav-item mx-lg-4">
-
-                    </li>
-                    {% for category in categories %}
-                    <li class="nav-item mx-lg-4">
-                    <a class="filter-btn nav-link btn-outline-primary shadow rounded-pill text-light px-4 light-300"
-               href="#" data-filter=".category-{{ category.id }}">
-            {{ category.title }}
-        </a>
-    </li>
-    {% endfor %}
-</ul>
-            </div>
-        </div>
+            <!-- Остальные категории -->
+            {% for category in categories %}
+            <li class="nav-item mx-lg-4">
+                <a class="border-white border-1 filter-btn nav-link btn-outline-primary shadow rounded-pill px-4 text-light {% if selected_category and selected_category.id == category.id %}active{% endif %}"
+                   href="{% url 'category' category.id %}">
+                    {{ category.title }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
     </section>
-
     <section class="container overflow-hidden py-5">
-        <div class="grid grid-cols-4">
+    <div class="row">
+        <!-- Start Recent Work -->
         {% for product in products %}
-        <a href="{% url 'single_view' product.id %}" class="cursor-pointer">
-            <div class="p-3 flex flex-col gap-3">
-                <p class="p-0">{{ product.title }}</p>
-                <img src="{{ product.image.url }}" alt="Car image" class="h-[150px] w-[220px] object-cover">
-                <h4>Цена: {{product.price}}$</h4>
-                <h4>Категория: {{product.category}}</h4>
-                <h4 class="text-sm text-gray-500">Создатель: {{ product.user.username }}</h4>
+            <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                <a href="{% url 'single_view' product.id %}" class="service-work card border-0 text-white shadow-sm overflow-hidden h-full">
+                    <img class="service card-img" src="{{ product.image.url }}" alt="Card image">
+                    <div class="service-work-vertical card-img-overlay d-flex align-items-end">
+                        <div class="service-work-content text-left text-light">
+                            <span class="btn btn-outline-light rounded-pill mb-lg-3 px-lg-4 light-300">{{ product.title }}</span>
+                            <p class="card-text">{{ product.description|truncatechars:28 }}</p>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </a>
         {% endfor %}
-        </div>
-    </section>
+        <!-- End Recent Work -->
+    </div>
+</section>
+
     <!-- End Service -->
 
 {% endblock %}
