@@ -1,11 +1,11 @@
+{% load static %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Создать аккаунт</title>
-
   <style>
-    /* контейнер уведомлений */
     .messages {
       position: fixed;
       top: 20px;
@@ -15,7 +15,6 @@
       padding: 0;
       z-index: 1000;
     }
-    /* само уведомление */
     .messages li {
       position: relative;
       min-width: 200px;
@@ -29,7 +28,6 @@
       opacity: 1;
       transition: opacity 0.5s ease-in-out;
     }
-    /* разные цвета для разных уровней */
     .messages li.success { border-color: #28a745; }
     .messages li.info    { border-color: #17a2b8; }
     .messages li.warning { border-color: #ffc107; }
@@ -48,11 +46,17 @@
     </ul>
   {% endif %}
 
-  <form method="post" action=".">
+  <form method="post" action="{% url 'register' %}">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Создать</button>
   </form>
+
+  <!-- JS -->
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/js/templatemo.js' %}"></script>
+  <script src="{% static 'assets/js/custom.js' %}"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function(){
@@ -67,3 +71,4 @@
 
 </body>
 </html>
+{% endblock %}

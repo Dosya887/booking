@@ -1,0 +1,68 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block content %}
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <div
+        class="flex justify-center items-center gap-5 bg-red-300 h-screen
+        bg-[url('https://w0.peakpx.com/wallpaper/225/762/HD-wallpaper-spring-in-the-woods-forest-spring-trees-meadow-8k.jpg')]
+        bg-cover bg-center bg-no-repeat
+    ">
+        <div class="bg-white p-10 rounded-3xl relative">
+            <a href="{% url 'index' %}" class="absolute left-1 top-2 flex items-center text-blue-600 hover:text-pink-400 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span class="text-lg font-medium">Назад</span>
+            </a>
+
+            {# Блок для отображения имени пользователя и кнопки "Выйти" #}
+            {% if user.is_authenticated %}
+                <div class="text-center mb-4">
+                    <p class="text-xl font-semibold">Добро пожаловать, {{ user.username }}!</p>
+                    {# ИСПРАВЛЕНИЕ ЗДЕСЬ: Используем форму с POST-запросом для выхода #}
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %} {# Django требует этот токен для всех POST-форм #}
+                        <button type="submit"
+                                class="mt-2 inline-block text-white font-sans py-2 px-6 rounded-xl shadow-lg transition duration-300 hover:opacity-90 cursor-pointer bg-gradient-to-b from-red-400 via-red-500 to-red-600">
+                            Выйти
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                {# Форма логина, которая показывается только если пользователь не аутентифицирован #}
+                    <form method="post" action="{% url 'login' %}" class="flex flex-col gap-2">
+                    {% csrf_token %}
+                    <p class="text-xl">Email</p>
+                    <input class="border border-black p-2 rounded " type="email" name="email" required>
+                    <p class="text-xl">Пароль</p>
+                    <input class="border border-black p-2 rounded " type="password" name="password">
+                    <div class="flex items-center gap-4 mt-4">
+                        <!-- Кнопка "Войти" — синий градиент -->
+                        <div class="flex justify-center items-center">
+                            <button
+                                class="text-white font-sans py-3 px-12 rounded-xl shadow-lg transition duration-300 hover:opacity-90 cursor-pointer bg-gradient-to-b from-blue-300 via-blue-400 via-blue-500 via-blue-600 via-blue-700 to-blue-800"
+                                type="submit"
+                            >
+                                Войти
+                            </button>
+                        </div>
+
+                        <!-- Кнопка "Регистрация" — розовый градиент -->
+                        <div class="flex justify-center items-center">
+                            <a href="{% url 'register' %}">
+                                <button
+                                    class="text-white font-sans py-3 px-12 rounded-xl shadow-lg transition duration-300 hover:opacity-90 cursor-pointer bg-gradient-to-b from-pink-300 via-pink-400 via-pink-500 via-pink-600 via-pink-700 to-pink-800"
+                                    type="button"
+                                >
+                                    Регистрация
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

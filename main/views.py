@@ -1,18 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from .forms import CustomUserCreationForm
-from .models import Product, Category
+from .models import Product, Category, Favorite
+
+from django.contrib.auth import login, authenticate, logout
+
 
 
 def index(request):
     categories = Category.objects.all()
     products = Product.objects.all()
+    favorite_ids = []
+    if request.user.is_authenticated:
+        favorite_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
     return render(request, 'main/index.html', {
         'categories': categories,
         'products': products,
+        'favorite_ids': favorite_ids,
         'selected_category': None,  # Для выделения активной кнопки
     })
 
@@ -32,34 +38,22 @@ def single_view(request, product_id):
     return render(request, 'main/single.html', {'product': product})
 
 
+def favorite_product_view(request):
+    favorites = Favorite.objects.filter(user=request.user).select_related('product')
+    return render(request, 'main/favorite.html', {'favorites': favorites})
 
-def user_register(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)  # автоматический вход после регистрации
-            messages.success(request, 'Вы успешно создали аккаунт')
-            return redirect('index')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f'{field}: {error}')
+def like_product_view(request, product_id):
+
+    if not request.user.is_authenticated:
+        messages.error(request, 'Войдите в систему')
+        return redirect('index')
+
+    product = get_object_or_404(Product, id=product_id)
+    like_product = Favorite.objects.filter(user=request.user, product=product).first()
+    if not like_product:
+        Favorite.objects.create(user=request.user, product=product)
+
     else:
-        form = CustomUserCreationForm()
-    return render(request, 'main/register.html', {'form': form})
+        like_product.delete()
 
-
-
-def user_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-
-        user = authenticate(request=request, username=username, password=password)
-        if user:
-            login(request, user)
-            messages.success(request, 'Вы успешно вошли в систему')
-            return redirect('index')
-        messages.error(request, 'Неправильный логин или пароль')
-    return render(request, 'main/login.html')
+    return redirect('index')
