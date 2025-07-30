@@ -9,4 +9,6 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('login/', login_view, name='login'),
     path('confirm/', confirm_2fa_view, name='confirm_2fa'),
+    path('feedback/<int:product_id>/create/', views.user_product_feedback_view, name='feedback_create'),
+    path('feedback_response/<int:response_id>/create/', views.feedback_response_view, name='feedback_response'),
 ]

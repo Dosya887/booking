@@ -3,9 +3,9 @@ from django.contrib.auth import login, authenticate, logout, get_user_model
 from .forms import CustomUserCreationForm
 from .utils import send_2fa_code
 from django.contrib import messages
-
-
+from .models import Feedback, FeedbackResponse
 from .models import Email2FACode
+from main.models import Product
 
 
 def user_register(request):
@@ -33,12 +33,13 @@ def login_view(request):
         user = authenticate(request, email=email, password=password)
         if user:
             request.session['pre_2fa_user_id'] = user.id
-            send_2fa_code(user)
+            send_2fa_code(user)  # отправка кода и сохранение
             return redirect('confirm_2fa')
         else:
             messages.error(request, 'Неверные учетные данные')
 
     return render(request, 'user/login.html')
+
 
 
 def confirm_2fa_view(request):
@@ -48,7 +49,7 @@ def confirm_2fa_view(request):
 
     user = get_object_or_404(get_user_model(), id=user_id)
     if request.method == 'POST':
-        code_input = request.POST['code']
+        code_input = request.POST['code'].strip()
         twofa = Email2FACode.objects.filter(user=user).first()
         if twofa and not twofa.is_expired() and twofa.code == code_input:
             login(request, user)
@@ -59,3 +60,28 @@ def confirm_2fa_view(request):
             messages.error(request, 'Неверный или просроченный код')
 
     return render(request, 'user/confirm_2fa.html', {'email': user.email})
+
+
+def user_product_feedback_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        comment = request.POST['comment']
+
+        Feedback.objects.create(user=request.user, product=product, comment=comment)
+
+        messages.success(request, 'Комментарий добавлен')
+        return redirect('single_view', product.id)
+    return render(request, 'main/single.html', {'product': product})
+
+
+def feedback_response_view(request, response_id):
+    feedback = get_object_or_404(Feedback, id=response_id)
+
+    if request.method == 'POST':
+        comment = request.POST['comment']
+
+        FeedbackResponse.objects.create(user=request.user, feedback=feedback, comment=comment)
+
+        messages.success(request, 'Комментарий добавлен')
+        return redirect('single_view', feedback.product.id)
+

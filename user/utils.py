@@ -1,5 +1,5 @@
 import random
-from .models import Email2FACode
+from .models import Email2FACode, MyUser
 from django.core.mail import send_mail
 
 
@@ -9,9 +9,9 @@ def send_2fa_code(user):
     Email2FACode.objects.update_or_create(user=user, defaults={'code': code})
 
     send_mail(
-        subject='Ваш код подтверждение',
-        message='Ваш код для входа: {code}',
+        subject='Ваш код подтверждения',
+        message=f'Ваш код для входа: {code}',
         from_email='tdastan.312@gmail.com',
         recipient_list=[user.email],
-
+        fail_silently=False
     )

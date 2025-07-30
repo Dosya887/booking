@@ -26,7 +26,7 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='Категория')
     user = models.ForeignKey('user.MyUser', on_delete=models.CASCADE, verbose_name='Пользователь', related_name='products')
     title = models.CharField(max_length=123, verbose_name='Название')
     area = models.CharField(max_length=123, verbose_name='Площадь')
@@ -56,3 +56,6 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.product}"
+
+
+

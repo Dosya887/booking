@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from .choices import MyUserRoleEnum # Убедитесь, что это правильный импорт, если choices.py в той же папке
+from .choices import MyUserRoleEnum
+from django.utils import timezone
+from datetime import timedelta
+from main.models import Product
+
 
 class MyUserManager(BaseUserManager):
     def create_user(self, username, email, password=None):
@@ -74,5 +78,24 @@ class Email2FACode(models.Model):
     code = models.CharField(max_length=6, verbose_name='6-значный код')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=5)
+
     def __str__(self):
-        return f"{self.user.email} - {self.code}"
+        return f"{self.user.email} — {self.code}"
+
+
+class Feedback(models.Model):
+    user = models.ForeignKey('user.MyUser', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='feedback')
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.user} - {self.product}"
+
+
+class FeedbackResponse(models.Model):
+    user = models.ForeignKey('user.MyUser', on_delete=models.CASCADE)
+    feedback = models.ForeignKey(Feedback, on_delete=models.CASCADE, related_name='feedback_responses')
+    created_at = models.DateTimeField(auto_now_add=True)
+    comment = models.TextField()

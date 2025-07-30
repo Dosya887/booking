@@ -1,12 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
-from .forms import CustomUserCreationForm
 from .models import Product, Category, Favorite
-
-from django.contrib.auth import login, authenticate, logout
-
 
 
 def index(request):
@@ -35,9 +30,15 @@ def category_view(request, category_id):
 
 def single_view(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    return render(request, 'main/single.html', {'product': product})
+    recommendations_products = Product.objects.filter(category=product.category).exclude(id=product.id)
+    product_like = Favorite.objects.filter(product=product).count()
+    return render(request, 'main/single.html', {
+        'product': product,
+        'recommendations_products': recommendations_products,
+        'product_like': product_like,
+    })
 
-
+@login_required
 def favorite_product_view(request):
     favorites = Favorite.objects.filter(user=request.user).select_related('product')
     return render(request, 'main/favorite.html', {'favorites': favorites})
