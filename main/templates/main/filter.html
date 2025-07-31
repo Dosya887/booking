@@ -1,0 +1,64 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block content %}
+{% load widget_tweaks %}
+
+<div class="container my-5">
+  <div class="card shadow-sm mx-auto" style="max-width: 720px;">
+    <div class="card-body">
+      <h5 class="card-title mb-4 text-center">🔎 Фильтрация товаров</h5>
+      <form method="get" class="row gy-3 gx-4 align-items-end justify-content-center">
+        <div class="col-md-6 col-lg-4">
+          <label for="{{ filter.form.title.id_for_label }}" class="form-label">Название</label>
+          {% render_field filter.form.title class="form-control" placeholder="Поиск по названию" %}
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <label for="{{ filter.form.price_min.id_for_label }}" class="form-label">Цена от</label>
+          {% render_field filter.form.price_min class="form-control" placeholder="Минимальная цена" %}
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <label for="{{ filter.form.price_max.id_for_label }}" class="form-label">Цена до</label>
+          {% render_field filter.form.price_max class="form-control" placeholder="Максимальная цена" %}
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <label for="{{ filter.form.city.id_for_label }}" class="form-label">Город</label>
+          {% render_field filter.form.city class="form-control" placeholder="Введите город" %}
+        </div>
+        <div class="col-12 d-flex justify-content-center mt-3">
+          <button type="submit" class="btn btn-primary px-4">Применить фильтр</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+    <section class="container overflow-hidden py-5">
+    <div class="row">
+        <!-- Start Recent Work -->
+        {% for product in products %}
+            <div class="col-xl-3 col-md-4 col-sm-6 mb-4 position-relative">
+                <a href="{% url 'single_view' product.id %}" class="service-work card border-0 text-white shadow-sm overflow-hidden h-full">
+                    <img class="service card-img" src="{{ product.image.url }}" alt="Card image">
+                    <div class="service-work-vertical card-img-overlay d-flex align-items-end">
+                        <div class="service-work-content text-left text-light">
+                            <span class="btn btn-outline-light rounded-pill mb-lg-3 px-lg-4 light-300">{{ product.title }}</span>
+                            <p class="card-text">{{ product.description|truncatechars:28 }}</p>
+                        </div>
+                    </div>
+                </a>
+                 <form method="post" action="{% url 'like_product' product.id %}" class="position-absolute m-2" style="bottom: 5px; right: 10px;">
+                    {% csrf_token %}
+                    <button type="submit" class="bg-transparent border border-0">
+                        <i class="bx {% if product.id in favorite_ids %}bxs-heart text-danger rounded-circle{% else %}bx-heart text-danger{% endif %} fs-3"></i>
+                    </button>
+                </form>
+            </div>
+        {% endfor %}
+        <!-- End Recent Work -->
+    </div>
+</section>
+
+
+{% endblock %}

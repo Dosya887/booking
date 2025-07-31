@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from .filters import ProductFilter
+
 from .models import Product, Category, Favorite
 
 
@@ -58,3 +60,15 @@ def like_product_view(request, product_id):
         like_product.delete()
 
     return redirect('index')
+
+
+def product_list_view(request):
+    products = Product.objects.filter(is_active=True)
+    product_filter = ProductFilter(request.GET, queryset=products)
+    return render(request, 'main/filter.html', {
+        'filter': product_filter,
+        'products': product_filter.qs,  # вот здесь добавь это!
+    })
+
+
+
